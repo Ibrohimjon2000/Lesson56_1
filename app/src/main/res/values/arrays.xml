@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="type">
+        <item>Ogohlantiruvchi</item>
+        <item>Imtiyozli</item>
+        <item>Ta\'qiqlovchi</item>
+        <item>Buyuruvchi</item>
+        <item>Axborot ishora</item>
+        <item>Servis</item>
+        <item>Qo\'shimcha axborot</item>
+    </string-array>
+</resources>
