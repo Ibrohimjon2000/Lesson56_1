@@ -137,25 +137,9 @@ class AddFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun takePhotoFromGalleryNewMethod() {
-        takePhotoResult.launch("image/*")
-    }
-
-    private val takePhotoResult =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri == null) return@registerForActivityResult
-            binding.img.setImageURI(uri)
-            val openInputStream = activity?.contentResolver?.openInputStream(uri)
-            val file = File(activity?.filesDir, "${System.currentTimeMillis()}.jpg")
-            val fileOutputStream = FileOutputStream(file)
-            currentPhotoPath = file.absolutePath.toString()
-            openInputStream?.copyTo(fileOutputStream)
-            openInputStream?.close()
-        }
-
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            if (map[Manifest.permission.CAMERA]==true && map[Manifest.permission.READ_EXTERNAL_STORAGE]==true) {
+            if (map[Manifest.permission.CAMERA]==true && map[Manifest.permission.READ_EXTERNAL_STORAGE]==true) {6
                 val customDialog = layoutInflater.inflate(R.layout.custom_dialog, null)
                 val mBuilder = AlertDialog.Builder(requireContext()).setView(customDialog)
                 mBuilder.setCancelable(false)
@@ -172,6 +156,22 @@ class AddFragment : Fragment() {
             } else {
 
             }
+        }
+
+    private fun takePhotoFromGalleryNewMethod() {
+        takePhotoResult.launch("image/*")
+    }
+
+    private val takePhotoResult =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri == null) return@registerForActivityResult
+            binding.img.setImageURI(uri)
+            val openInputStream = activity?.contentResolver?.openInputStream(uri)
+            val file = File(activity?.filesDir, "${System.currentTimeMillis()}.jpg")
+            val fileOutputStream = FileOutputStream(file)
+            currentPhotoPath = file.absolutePath.toString()
+            openInputStream?.copyTo(fileOutputStream)
+            openInputStream?.close()
         }
 
     private fun takePhotoFromCameraNewMethod() {
