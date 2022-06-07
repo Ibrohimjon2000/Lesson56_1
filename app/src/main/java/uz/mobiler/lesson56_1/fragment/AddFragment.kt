@@ -105,6 +105,7 @@ class AddFragment : Fragment() {
                     "Ma'lumotlar to'liq kiritilmagan",
                     Toast.LENGTH_SHORT
                 ).show()
+
             }
         }
         return binding.root

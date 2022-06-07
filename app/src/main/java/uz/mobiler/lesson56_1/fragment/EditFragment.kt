@@ -57,7 +57,8 @@ class EditFragment : Fragment() {
             actionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
             actionBar?.setDisplayShowHomeEnabled(true)
             actionBar?.setDisplayHomeAsUpEnabled(true)
-            img.setImageURI(Uri.fromFile(File(param1.modelPhotoPath)))
+            currentPhotoPath=param1.modelPhotoPath
+            img.setImageURI(Uri.fromFile(File(currentPhotoPath)))
             name.setText(param1.name)
             description.setText(param1.description)
             val list = arrayOf(
@@ -161,8 +162,6 @@ class EditFragment : Fragment() {
             if (map[Manifest.permission.READ_EXTERNAL_STORAGE] == true) {
                 takePhotoFromGalleryNewMethod()
             } else {
-
-
             }
         }
 }

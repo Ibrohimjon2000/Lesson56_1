@@ -33,7 +33,15 @@ class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var viewPager2FragmentAdapter: ViewPager2FragmentAdapter
-    val list = ArrayList<String>()
+    val list = arrayOf(
+        "Ogohlantiruvchi",
+        "Imtiyozli",
+        "Ta'qiqlovchi",
+        "Buyuruvchi",
+        "Axborot-ishora",
+        "Servis",
+        "Qo'shimcha axborot"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,18 +50,13 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         binding.apply {
             val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
-            (requireActivity() as AppCompatActivity).findViewById<BottomNavigationView>(R.id.bottom_navigation).visibility=View.VISIBLE
-                actionBar?.setDisplayShowHomeEnabled(false)
-                actionBar?.setDisplayHomeAsUpEnabled(false)
+            (requireActivity() as AppCompatActivity).findViewById<BottomNavigationView>(R.id.bottom_navigation).visibility =
+                View.VISIBLE
+            actionBar?.setDisplayShowHomeEnabled(false)
+            actionBar?.setDisplayHomeAsUpEnabled(false)
             actionBar?.title = "Yo’l belgilari"
-            list.add("Ogohlantiruvchi")
-            list.add("Imtiyozli")
-            list.add("Ta'qiqlovchi")
-            list.add("Buyuruvchi")
-            list.add("Axborot-ishora")
-            list.add("Servis")
-            list.add("Qo'shimcha axborot")
-            viewPager2FragmentAdapter = ViewPager2FragmentAdapter(requireParentFragment(), list)
+            viewPager2FragmentAdapter =
+                ViewPager2FragmentAdapter(this@HomeFragment, list.toList())
             binding.viewPager.adapter = viewPager2FragmentAdapter
             val tabLayoutMediator =
                 TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
@@ -63,12 +66,12 @@ class HomeFragment : Fragment() {
                     if (position == 0) {
                         customTabBinding.liner.setBackgroundResource(R.drawable.tab_selector)
                         customTabBinding.title.setTextColor(Color.parseColor("#005CA1"))
-                    }else{
+                    } else {
                         customTabBinding.liner.setBackgroundResource(R.drawable.tab_unselector)
                         customTabBinding.title.setTextColor(Color.WHITE)
                     }
                     tab.customView = customTabBinding.root
-                    tabLayout.addOnTabSelectedListener(object :TabLayout.OnTabSelectedListener{
+                    tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab) {
                             val binding = tab.customView?.let { CustomTabBinding.bind(it) }
                             binding?.liner?.setBackgroundResource(R.drawable.tab_selector)
@@ -84,7 +87,6 @@ class HomeFragment : Fragment() {
                         override fun onTabReselected(tab: TabLayout.Tab?) {
 
                         }
-
                     })
                 }
             tabLayoutMediator.attach()
@@ -110,7 +112,7 @@ class HomeFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.add) {
-           Navigation.findNavController(binding.root).navigate(R.id.addFragment)
+            Navigation.findNavController(binding.root).navigate(R.id.addFragment)
         }
         return super.onOptionsItemSelected(item)
     }

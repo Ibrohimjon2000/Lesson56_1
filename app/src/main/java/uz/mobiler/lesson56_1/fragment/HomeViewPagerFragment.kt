@@ -42,115 +42,83 @@ class HomeViewPagerFragment : Fragment() {
     ): View {
         binding = FragmentHomeViewPagerBinding.inflate(inflater, container, false)
         binding.apply {
-            when (param1.toString()) {
-                "Ogohlantiruvchi" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Ogohlantiruvchi"))
-                    work()
-                }
-                "Imtiyozli" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Imtiyozli"))
-                    work()
-                }
-                "Ta'qiqlovchi" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Ta\'qiqlovchi"))
-                    work()
-                }
-                "Buyuruvchi" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Buyuruvchi"))
-                    work()
-                }
-                "Axborot-ishora" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Axborot ishora"))
-                    work()
-                }
-                "Servis" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Servis"))
-                    work()
-                }
-                "Qo'shimcha axborot" -> {
-                    modelList = ArrayList(appDatabase.modelDao().getTypeModel("Qo\'shimcha axborot"))
-                    work()
-                }
+            modelList = ArrayList(appDatabase.modelDao().getTypeModel(param1.toString()))
+            if (modelList.isNotEmpty()) {
+                binding.lottie.visibility = View.INVISIBLE
+            } else {
+                binding.lottie.visibility = View.VISIBLE
             }
+            customAdapter = CustomAdapter(modelList, object : CustomAdapter.OnItemClickListener {
+                override fun onItemClick(model: Model, position: Int) {
+                    val bundle = Bundle()
+                    bundle.putSerializable("model", model)
+                    Navigation.findNavController(binding.root).navigate(R.id.aboutFragment, bundle)
+                }
+
+                override fun onItemEdit(model: Model, position: Int) {
+                    val bundle = Bundle()
+                    bundle.putSerializable("model", model)
+                    Navigation.findNavController(binding.root).navigate(R.id.editFragment, bundle)
+                }
+
+                override fun onItemDelete(model: Model, position: Int) {
+                    AlertDialog.Builder(requireContext()).setCancelable(false)
+                        .setMessage("Haqiqatda o’chirmoqchimisiz ?")
+                        .setPositiveButton("Ha") { dialog, _ ->
+                            appDatabase.modelDao().deleteModel(model)
+                            modelList.remove(model)
+                            customAdapter.notifyItemRemoved(position)
+                            customAdapter.notifyItemRangeChanged(position, modelList.size)
+                            if (modelList.isNotEmpty()) {
+                                binding.lottie.visibility = View.INVISIBLE
+                            } else {
+                                binding.lottie.visibility = View.VISIBLE
+                            }
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Yo’q") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+                }
+
+                override fun onItemLike(
+                    model: Model,
+                    position: Int,
+                    holder: CustomAdapter.Vh
+                ) {
+                    if (!model.isLike) {
+                        holder.isLike.setImageResource(R.drawable.ic_heart_red)
+                        model.isLike = true
+                        val m = Model(
+                            id = model.id,
+                            name = model.name,
+                            description = model.description,
+                            type = model.type,
+                            isLike = model.isLike,
+                            modelPhotoPath = model.modelPhotoPath
+                        )
+                        appDatabase.modelDao().editModel(m)
+                    } else {
+                        holder.isLike.setImageResource(R.drawable.ic_heart_white)
+                        model.isLike = false
+                        val m = Model(
+                            id = model.id,
+                            name = model.name,
+                            description = model.description,
+                            type = model.type,
+                            isLike = model.isLike,
+                            modelPhotoPath = model.modelPhotoPath
+                        )
+                        appDatabase.modelDao().editModel(m)
+                    }
+                }
+
+            })
+            binding.rv.adapter = customAdapter
         }
         return binding.root
-    }
-
-    private fun work() {
-        if(modelList.isNotEmpty()){
-            binding.lottie.visibility=View.INVISIBLE
-        }else{
-            binding.lottie.visibility=View.VISIBLE
-        }
-        customAdapter = CustomAdapter(modelList, object : CustomAdapter.OnItemClickListener {
-            override fun onItemClick(model: Model, position: Int) {
-                val bundle = Bundle()
-                bundle.putSerializable("model", model)
-                Navigation.findNavController(binding.root).navigate(R.id.aboutFragment, bundle)
-            }
-
-            override fun onItemEdit(model: Model, position: Int) {
-                val bundle = Bundle()
-                bundle.putSerializable("model", model)
-                Navigation.findNavController(binding.root).navigate(R.id.editFragment, bundle)
-            }
-
-            override fun onItemDelete(model: Model, position: Int) {
-                AlertDialog.Builder(requireContext()).setCancelable(false)
-                    .setMessage("Haqiqatda o’chirmoqchimisiz ?")
-                    .setPositiveButton("Ha") { dialog, _ ->
-                        appDatabase.modelDao().deleteModel(model)
-                        modelList.remove(model)
-                        customAdapter.notifyItemRemoved(position)
-                        customAdapter.notifyItemRangeChanged(position,modelList.size)
-                        if(modelList.isNotEmpty()){
-                            binding.lottie.visibility=View.INVISIBLE
-                        }else{
-                            binding.lottie.visibility=View.VISIBLE
-                        }
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton("Yo’q") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
-            }
-
-            override fun onItemLike(
-                model: Model,
-                position: Int,
-                holder: CustomAdapter.Vh
-            ) {
-                if (!model.isLike) {
-                    holder.isLike.setImageResource(R.drawable.ic_heart_red)
-                    model.isLike = true
-                    val m = Model(
-                        id = model.id,
-                        name = model.name,
-                        description = model.description,
-                        type = model.type,
-                        isLike = model.isLike,
-                        modelPhotoPath = model.modelPhotoPath
-                    )
-                    appDatabase.modelDao().editModel(m)
-                } else {
-                    holder.isLike.setImageResource(R.drawable.ic_heart_white)
-                    model.isLike = false
-                    val m = Model(
-                        id = model.id,
-                        name = model.name,
-                        description = model.description,
-                        type = model.type,
-                        isLike = model.isLike,
-                        modelPhotoPath = model.modelPhotoPath
-                    )
-                    appDatabase.modelDao().editModel(m)
-                }
-            }
-
-        })
-        binding.rv.adapter = customAdapter
     }
 
     companion object {
