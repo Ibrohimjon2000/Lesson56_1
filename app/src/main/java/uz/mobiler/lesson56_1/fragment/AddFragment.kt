@@ -139,7 +139,7 @@ class AddFragment : Fragment() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            if (map[Manifest.permission.CAMERA]==true && map[Manifest.permission.READ_EXTERNAL_STORAGE]==true) {6
+            if (map[Manifest.permission.CAMERA]==true && map[Manifest.permission.READ_EXTERNAL_STORAGE]==true) {
                 val customDialog = layoutInflater.inflate(R.layout.custom_dialog, null)
                 val mBuilder = AlertDialog.Builder(requireContext()).setView(customDialog)
                 mBuilder.setCancelable(false)
