@@ -1,25 +1,33 @@
 package uz.mobiler.lesson56_1.fragment
 
 import android.Manifest
+import android.app.AlertDialog
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import uz.mobiler.lesson56_1.BuildConfig
 import uz.mobiler.lesson56_1.R
 import uz.mobiler.lesson56_1.database.AppDatabase
 import uz.mobiler.lesson56_1.database.entity.Model
 import uz.mobiler.lesson56_1.databinding.FragmentAddBinding
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.lang.Exception
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -60,7 +68,8 @@ class AddFragment : Fragment() {
             img.setOnClickListener {
                 requestPermissionLauncher.launch(
                     arrayOf(
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA
                     )
                 )
             }
@@ -146,10 +155,50 @@ class AddFragment : Fragment() {
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-            if (map[Manifest.permission.READ_EXTERNAL_STORAGE] == true) {
-                takePhotoFromGalleryNewMethod()
+            if (map[Manifest.permission.CAMERA]==true && map[Manifest.permission.READ_EXTERNAL_STORAGE]==true) {
+                val customDialog = layoutInflater.inflate(R.layout.custom_dialog, null)
+                val mBuilder = AlertDialog.Builder(requireContext()).setView(customDialog)
+                mBuilder.setCancelable(false)
+                val mAlertDialog = mBuilder.show()
+                mAlertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+                customDialog.findViewById<TextView>(R.id.camera).setOnClickListener{
+                    takePhotoFromCameraNewMethod()
+                    mAlertDialog.dismiss()
+                }
+                customDialog.findViewById<TextView>(R.id.gallery).setOnClickListener {
+                    takePhotoFromGalleryNewMethod()
+                    mAlertDialog.dismiss()
+                }
             } else {
 
             }
         }
+
+    private fun takePhotoFromCameraNewMethod() {
+        val file = try {
+            createImageFile()
+        } catch (e: Exception) {
+            null
+        }
+        val uriForFile = file?.let {
+            FileProvider.getUriForFile(requireContext(), BuildConfig.APPLICATION_ID, it)
+        }
+        takePhotoFromCameraResultLauncher.launch(uriForFile)
+    }
+
+    private val takePhotoFromCameraResultLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) {
+            if (it) {
+                binding.img.setImageURI(Uri.fromFile(File(currentPhotoPath)))
+            }
+        }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        val externalFilesDir = activity?.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("${System.currentTimeMillis()}", ".jpg", externalFilesDir)
+            .apply {
+                currentPhotoPath = absolutePath
+            }
+    }
 }
