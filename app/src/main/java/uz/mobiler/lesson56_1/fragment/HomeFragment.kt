@@ -38,7 +38,7 @@ class HomeFragment : Fragment() {
         "Imtiyozli",
         "Ta'qiqlovchi",
         "Buyuruvchi",
-        "Axborot-ishora",
+        "Axborot ishora",
         "Servis",
         "Qo'shimcha axborot"
     )
